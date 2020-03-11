@@ -1,19 +1,89 @@
 <template>
-    <div>
-        <Logout></Logout>
-    </div>
+  <el-container class="home-container">
+    <!--      头部-->
+    <el-header>
+      <div>
+        <img src="@/assets/img/heima.png" alt="">
+        <span>电商管理系统</span>
+      </div>
+      <Logout></Logout>
+    </el-header>
+
+    <el-container>
+      <!--侧边栏-->
+
+
+      <menu-list :menuList="menuList"/>
+
+      <!--主栏-->
+      <el-main>Main</el-main>
+    </el-container>
+  </el-container>
 </template>
 
 <script>
-    import Logout from "@/components/content/Logout";
-    export default {
-        name: "Home",
-        components:{
-            Logout
-        }
+  import Logout from "@/components/content/Logout";
+  import {requestMenu} from "@/network/home";
+  import MenuList from "@/views/home/MenuList";
+
+  export default {
+    name: "Home",
+    components: {
+      MenuList,
+      Logout
+    },
+
+    data() {
+      return {
+        menuList: [],
+      }
+    },
+    created() {
+      this.getMenuList()
+    },
+    methods: {
+      getMenuList() {
+        requestMenu().then(res => {
+
+          if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
+          this.menuList = res.data
+          console.log(this.menuList)
+
+        })
+      }
     }
+  }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
+  .home-container {
+    height: 100%;
+
+    .el-header {
+      background-color: #f5be6ccc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      > div {
+        display: flex;
+        align-items: center;
+
+        span {
+          margin-left: 10px;
+          color: #ffffff;
+          font-size: 26px;
+        }
+      }
+    }
+
+
+
+
+    .el-main {
+      background-color: #a4da89;
+    }
+
+  }
 
 </style>

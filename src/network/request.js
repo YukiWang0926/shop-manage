@@ -1,6 +1,6 @@
 import axios from 'axios'
 
- const instance = axios.create({
+const instance = axios.create({
 
   baseURL: "http://106.12.11.162:8888/api/private/v1/",
   timeout: 15000,
@@ -9,6 +9,8 @@ import axios from 'axios'
 
 //请求拦截
 instance.interceptors.request.use(config => {
+  // 需要授权的 API ，必须在请求头中使用 `Authorization` 字段提供 `token` 令牌
+  config.headers.Authorization=window.sessionStorage.getItem('token')
   return config;
 }, err => {
   alert(err);

@@ -52,7 +52,7 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             requestLogin(this.loginForm.username, this.loginForm.password).then(res => {
-              console.log(res)
+              // console.log(res)
               if (res.meta.status === 200) {
                 // this.$message.success("登录成功")
                 window.sessionStorage.setItem('token',res.data.token)
