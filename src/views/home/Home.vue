@@ -8,15 +8,14 @@
       </div>
       <Logout></Logout>
     </el-header>
-
-    <el-container>
+    <el-container style="overflow: auto">
       <!--侧边栏-->
-
-
       <menu-list :menuList="menuList"/>
-
       <!--主栏-->
-      <el-main>Main</el-main>
+
+      <el-main>
+        <router-view/>
+      </el-main>
     </el-container>
   </el-container>
 </template>
@@ -24,13 +23,14 @@
 <script>
   import Logout from "@/components/content/Logout";
   import {requestMenu} from "@/network/home";
-  import MenuList from "@/views/home/MenuList";
+  import MenuList from "@/components/content/MenuList";
 
   export default {
     name: "Home",
     components: {
       MenuList,
-      Logout
+      Logout,
+
     },
 
     data() {
@@ -43,12 +43,9 @@
     },
     methods: {
       getMenuList() {
-        requestMenu().then(res => {
-
-          if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
-          this.menuList = res.data
-          console.log(this.menuList)
-
+        requestMenu().then(data => {
+          this.menuList = data
+          // console.log(this.menuList)
         })
       }
     }
@@ -77,12 +74,6 @@
       }
     }
 
-
-
-
-    .el-main {
-      background-color: #a4da89;
-    }
 
   }
 

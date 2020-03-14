@@ -1,7 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Login from "../components/content/Login";
+import Login from "../views/login/Login";
 import Home from "@/views/home/Home";
+import Welcome from "@/views/home/childComps/Welcome";
+import Users from "@/views/users/Users";
+
 
 
 Vue.use(VueRouter);
@@ -9,18 +12,32 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: "/",
-    redirect:'/login'
+    redirect: '/login'
   },
   {
-    path:'/login',
-    component:Login,
-    name:'login'
+    path: '/login',
+    component: Login,
+    name: 'login'
   },
   {
-    path:'/home',
-    component:Home,
-    name:'home'
-  }
+    path: '/home',
+    component: Home,
+    name: 'home',
+    redirect:'welcome',
+    children:[
+      {
+        path:'/welcome',
+        component:Welcome,
+        name:'welcome'
+      },
+      {
+        path:'/users',
+        component: Users,
+
+      }
+    ]
+  },
+
 ];
 
 const router = new VueRouter({
@@ -30,10 +47,12 @@ const router = new VueRouter({
 });
 
 //挂载路由导航守卫
-router.beforeEach((to,from,next)=>{
-  if (to.path==='/login') return next()
+router.beforeEach((to, from, next) => {
+  if (to.path === '/login') return next()
   const tokenId = window.sessionStorage.getItem('token')
-  if (!tokenId) { next('/login')}
+  if (!tokenId) {
+    next('/login')
+  }
   next()
 })
 export default router
