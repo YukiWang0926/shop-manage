@@ -51,15 +51,13 @@
       login(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            requestLogin(this.loginForm.username, this.loginForm.password).then(res => {
-              // console.log(res)
-              if (res.meta.status === 200) {
+            requestLogin(this.loginForm.username, this.loginForm.password).then(data => {
+              //console.log(res)
                 // this.$message.success("登录成功")
-                window.sessionStorage.setItem('token',res.data.token)
+                window.sessionStorage.setItem('token',data.token)
                 this.$router.push('/home')
-              } else {
-                this.$message.error("用户或密码错误")
-              }
+            }).catch(err=>{
+              this.$message.error(err)
             });
           } else {
             return false

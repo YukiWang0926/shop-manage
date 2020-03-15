@@ -80,7 +80,6 @@
         this.userForm = {
           ...form
         }
-
       },
       submitForm() {
         this.$refs['userForm'].validate((valid) => {

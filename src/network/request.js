@@ -29,8 +29,6 @@ instance.interceptors.response.use(res => {
 
 export function request(config) {
   //发送真正的请求
-  return instance(config).catch(err => {
-    Message.error(err)
-  })
+  return instance(config)
 }
 

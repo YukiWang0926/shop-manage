@@ -12,8 +12,8 @@
       <!--侧边栏-->
       <menu-list :menuList="menuList"/>
       <!--主栏-->
-
       <el-main>
+        <bread-crumb :menuList="menuList"></bread-crumb>
         <router-view/>
       </el-main>
     </el-container>
@@ -22,15 +22,17 @@
 
 <script>
   import Logout from "@/components/content/Logout";
-  import {requestMenu} from "@/network/home";
   import MenuList from "@/components/content/MenuList";
+  import BreadCrumb from "@/components/content/BreadCrumb";
+
+  import {requestMenu} from "@/network/home";
 
   export default {
     name: "Home",
     components: {
       MenuList,
       Logout,
-
+      BreadCrumb
     },
 
     data() {

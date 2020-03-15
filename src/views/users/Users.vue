@@ -1,11 +1,5 @@
 <template>
   <div class="users-page">
-    <!--面包屑导航-->
-    <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>用户管理</el-breadcrumb-item>
-      <el-breadcrumb-item>用户列表</el-breadcrumb-item>
-    </el-breadcrumb>
     <!--    卡片-->
     <div class="user-info">
       <!--  搜索和添加添加用户-->
@@ -64,7 +58,7 @@
             <el-button
               icon="el-icon-delete"
               type="danger"
-              @click="handleDelete( scope.row.id)"></el-button>
+              @click="handleDelete(scope.row.id)"></el-button>
 
             <el-tooltip effect="dark" content="设置权限" placement="top" :enterable="false">
               <el-button
@@ -121,16 +115,8 @@
 </template>
 
 <script>
-  import {
-    requestUsers,
-    changeUsersStatus,
-    addPostUser,
-    queryUserForm,
-    putEditUserForm,
-    deleteUser
-  } from "@/network/users"
+  import userApi from "@/network/users"
   import UserForm from "@/views/users/form/UserForm";
-
 
   export default {
     components: {
@@ -160,7 +146,7 @@
     methods: {
       //获取用户列表
       getUsers() {
-        return requestUsers(this.query, this.pagenum, this.pagesize).then(data => {
+        return userApi.requestUsers(this.query, this.pagenum, this.pagesize).then(data => {
           this.userList = data.users
           this.total = data.total
         })
@@ -168,7 +154,7 @@
       //改变用户状态
       usersStateChange(userInfo) {
         // console.log(userInfo)
-        changeUsersStatus(userInfo.id, userInfo.mg_state).then(res => {
+        userApi.changeUsersStatus(userInfo.id, userInfo.mg_state).then(res => {
             // console.log(res.data.mg_state)
             if (res.meta.status !== 200) {
               userInfo.mg_state = !userInfo.mg_state
@@ -185,11 +171,9 @@
       //编辑用户,查询用户信息
       handleEdit(id) {
         this.editDialogVisible = true
-        queryUserForm(id).then(data => {
+        userApi.queryUserForm(id).then(data => {
           this.$refs.userForm.setForm(data)
         })
-
-
       },
       //删除用户
       handleDelete(id) {
@@ -199,7 +183,7 @@
           type: 'warning'
         }).then(() => {
           //确定删除，调用删除接口
-          deleteUser(id).then(this.getUsers)
+          userApi.deleteUser(id).then(this.getUsers).catch(err=>this.$message.error(err))
         }).catch(() => {
           this.$message({
             type: 'info',
@@ -227,16 +211,22 @@
       },
       //添加用户提交表单
       submit(userForm) {
-        addPostUser(userForm).then(() => {
+        userApi.addPostUser(userForm).then(() => {
           this.$refs.userForm.resetForm()
           this.getUsers()
           this.dialogVisible = false
+        }).catch((err)=>{
+          this.$message.error({
+            message:err,
+            showClose:true,
+            duration:1000
+          })
         })
       },
       //上传编辑表单
       editSubmit(userForm) {
-        console.log(userForm)
-        putEditUserForm(userForm.id, userForm).then(() => {
+
+        userApi.putEditUserForm(userForm.id, userForm).then(() => {
           this.getUsers()
           this.editDialogVisible = false
           this.$message.success('修改用户成功')

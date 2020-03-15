@@ -7,11 +7,12 @@ import Vue from 'vue'
 
 import {
   Button, Form, FormItem, Input, Message, Container, Aside, Main, Header, Menu, Submenu, MenuItem, Icon, Breadcrumb,
-  BreadcrumbItem,Card,Row,Col,Table,TableColumn,Switch,Tooltip,Pagination,Dialog,MessageBox
+  BreadcrumbItem,Card,Row,Col,Table,TableColumn,Switch,Tooltip,Pagination,Dialog,MessageBox,Tag,Tree
 
 } from "element-ui"
 
 Vue.prototype.$ELEMENT = { size: 'small', zIndex: 3000 };
+
 Vue.use(Button)
 Vue.use(Form)
 Vue.use(FormItem)
@@ -35,7 +36,8 @@ Vue.use(Switch)
 Vue.use(Tooltip)
 Vue.use(Pagination)
 Vue.use(Dialog)
-
+Vue.use(Tag)
+Vue.use(Tree)
 
 
 
