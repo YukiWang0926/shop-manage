@@ -3,9 +3,18 @@
 </template>
 
 <script>
+  // import goodsApi from '@/network/goods'
+
   export default {
-    name: "Goods"
+    name: "Goods",
+    created(){
+
+    },
+    methods:{
+
+    }
   }
+
 </script>
 
 <style scoped>

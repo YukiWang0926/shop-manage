@@ -54,11 +54,22 @@ function deleteUser(id) {
   })
 }
 
+function AssignUserRole(id,rid) {
+  const data = new URLSearchParams()
+  data.append('rid',rid)
+return request({
+  method:'put',
+  url:`users/${id}/role`,
+  data
+})
+}
+
 export default {
   requestUsers,
   changeUsersStatus,
   addPostUser,
   putEditUserForm,
   queryUserForm,
-  deleteUser
+  deleteUser,
+  AssignUserRole
 }

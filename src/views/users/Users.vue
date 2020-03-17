@@ -23,25 +23,11 @@
         border
         style="flex:1"
         :default-sort="{prop: 'create_time', order: 'descending'}">
-        <el-table-column type="index" :index="calIndex"></el-table-column>
-        <el-table-column
-          prop="username"
-          label="姓名"
-        >
-        </el-table-column>
-        <el-table-column
-          prop="email"
-          label="邮箱">
-        </el-table-column>
-        <el-table-column
-          prop="mobile"
-          label="电话">
-        </el-table-column>
-        <el-table-column
-          prop="role_name"
-          label="角色">
-        </el-table-column>
-
+        <el-table-column type="index" :index="calIndex"/>
+        <el-table-column prop="username" label="姓名"/>
+        <el-table-column prop="email" label="邮箱"/>
+        <el-table-column prop="mobile" label="电话"/>
+        <el-table-column prop="role_name" label="角色"/>
         <el-table-column label="状态" width="80px">
           <template slot-scope="scope">
             <el-switch v-model="scope.row.mg_state" @change="usersStateChange(scope.row)">
@@ -62,10 +48,9 @@
 
             <el-tooltip effect="dark" content="设置权限" placement="top" :enterable="false">
               <el-button
-
                 icon="el-icon-setting"
                 type="warning"
-                @click="handleSetting(scope.$index, scope.row)"></el-button>
+                @click="setRole(scope.row)"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -111,12 +96,42 @@
       <user-form ref="userForm" @submit="editSubmit" id="编辑用户"></user-form>
     </el-dialog>
 
+    <!--    设置权限dialog-->
+    <el-dialog
+      title="分配角色"
+      :visible.sync="setRoleDialogVisible"
+      width="30%"
+      @close="closeRoleDialog"
+    >
+      <div>
+        <p>当前用户:{{userInfo.username}}</p>
+        <p>当前角色:{{userInfo.role_name}}</p>
+        <p>分配新角色:
+          <el-select v-model="selectedRoleId" placeholder="请选择角色">
+            <el-option
+              v-for="item in roleNameList"
+              :key="item.id"
+              :label="item.roleName"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </p>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="setRoleDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveRoleInfo(selectedRoleId)">确 定</el-button>
+      </span>
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
-  import userApi from "@/network/users"
   import UserForm from "@/views/users/form/UserForm";
+
+  import userApi from "@/network/users"
+  import {requestRolesList} from '@/network/rights'
+
 
   export default {
     components: {
@@ -132,6 +147,10 @@
         pagesize: 10,
         dialogVisible: false,
         editDialogVisible: false,
+        setRoleDialogVisible: false,
+        userInfo: {},
+        roleNameList: [],
+        selectedRoleId: ''
       }
     },
     computed: {
@@ -154,19 +173,11 @@
       //改变用户状态
       usersStateChange(userInfo) {
         // console.log(userInfo)
-        userApi.changeUsersStatus(userInfo.id, userInfo.mg_state).then(res => {
-            // console.log(res.data.mg_state)
-            if (res.meta.status !== 200) {
-              userInfo.mg_state = !userInfo.mg_state
-              return this.$message.error('更新用户失败')
-            }
-            this.$message({
-              message: res.meta.msg,
-              type: 'success',
-              duration: 1000
-            })
-          }
-        )
+        userApi.changeUsersStatus(userInfo.id, userInfo.mg_state).then(
+          this.$message.success('更新状态成功')
+        ).catch(err=>{
+          this.$message.error(err)
+        })
       },
       //编辑用户,查询用户信息
       handleEdit(id) {
@@ -183,15 +194,13 @@
           type: 'warning'
         }).then(() => {
           //确定删除，调用删除接口
-          userApi.deleteUser(id).then(this.getUsers).catch(err=>this.$message.error(err))
+          userApi.deleteUser(id).then(this.getUsers).catch(err => this.$message.error(err))
         }).catch(() => {
           this.$message({
             type: 'info',
             message: '已取消删除'
           });
         });
-
-
       },
       //设置用户
       handleSetting(index, row) {
@@ -215,25 +224,49 @@
           this.$refs.userForm.resetForm()
           this.getUsers()
           this.dialogVisible = false
-        }).catch((err)=>{
+        }).catch((err) => {
           this.$message.error({
-            message:err,
-            showClose:true,
-            duration:1000
+            message: err,
+            showClose: true,
+            duration: 1000
           })
         })
       },
       //上传编辑表单
       editSubmit(userForm) {
-
         userApi.putEditUserForm(userForm.id, userForm).then(() => {
           this.getUsers()
           this.editDialogVisible = false
           this.$message.success('修改用户成功')
 
         })
+      },
+      //分配角色
+      setRole(userInfo) {
+        this.userInfo = userInfo
+        //请求角色列表
+        requestRolesList().then(data => {
+          this.roleNameList = data
+        }).catch(err => {
+          this.$message.error(err)
+        })
+        this.setRoleDialogVisible = true
+      },
+      //保存分配的用户角色
+      saveRoleInfo(rid) {
+        if (!this.selectedRoleId) {
+          return this.$message.error('请选择分配角色')
+        }
+        userApi.AssignUserRole(this.userInfo.id, rid).then(() => {
+          this.getUsers()
+        })
+        this.setRoleDialogVisible = false
+      },
+      //监听关闭权限对话框
+      closeRoleDialog() {
+        this.selectedRoleId = ''
+        this.userInfo = []
       }
-
     },
   }
 </script>
@@ -256,6 +289,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      background-color: #fff;
     }
   }
 
